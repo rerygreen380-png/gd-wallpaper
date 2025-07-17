@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smooth GD Cube</title>
+  <style>
+    html, body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: url('background.png') repeat-x;
+      background-size: cover;
+    }
+
+    #cube {
+      position: absolute;
+      width: 64px;
+      height: 465px;
+      background: url('cube.png') no-repeat center;
+      background-size: contain;
+      bottom: 0px;
+      left: 0;
+      .particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 0.4s linear;
+}
+
+    }
+
+    #ground {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 150%;
+      height: 300px;
+      background: url('ground.png') repeat-x;
+      background-size: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="cube"></div>
+    <div id="ground"></div>
+  </div>
+  <input type="file" id="upload" accept="image/png, image/jpeg" style="position:absolute;top:10px;left:10px;z-index:1000;">
+
+
+  <script>
+     {
+      const cube = document.getElementById("cube");
+      // Загружаем сохранённый куб из localStorage (если есть)
+const savedCube = localStorage.getItem("customCube");
+if (savedCube) {
+  cube.style.backgroundImage = `url(${savedCube})`;
+}
+
+  
+    }
+    let posX = 0;
+    let posY = 0;
+    let velY = 0;
+    const gravity = -1.3;
+    const jumpVelocity = 22;
+    const screenWidth = window.innerWidth;
+
+    let isJumping = false;
+
+    let currentRotation = 0;
+    let targetRotation =  0;
+    const rotationSpeed = 6; // градусов за кадр
+ 
+
+    
+
+    function gameLoop() {
+      // Горизонтальное движение
+  posX += 8; 
+;
+      if (posX > screenWidth + 64) {
+        posX = -64;
+      }
+      function createParticle(x, y) {
+  const p = document.createElement("div");
+  p.className = "particle";
+  document.getElementById("game").appendChild(p);
+  p.style.left = x + "px";
+  p.style.bottom = y + "px";
+
+  // Двигаем влево
+  let offset = 0;
+  const speed = 0;
+  const fadeTime = 1000; // миллисекунды
+
+  const move = () => {
+    offset += speed;
+    p.style.left = (x - offset) + "px";
+  };
+
+  const interval = setInterval(move, 16);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    p.style.opacity = 0;
+    setTimeout(() => p.remove(), 400);
+  }, fadeTime);
+}
+
+      cube.style.left = posX + "px";
+
+      // Прыжок с гравитацией
+      if (isJumping || posY > 0) {
+        velY += gravity;
+        posY += velY;
+
+        if (posY <= 0) {
+          posY = 0;
+          velY = 0;
+          isJumping = false;
+        }
+      }
+
+      cube.style.bottom = (100 + posY) + "px";
+
+      // Плавное вращение
+      if (currentRotation < targetRotation) {
+        currentRotation += rotationSpeed;
+        if (currentRotation > targetRotation) currentRotation = targetRotation;
+      }
+
+      cube.style.transform = `rotate(${currentRotation}deg)`;
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    document.addEventListener("mousedown", () => {
+      if (!isJumping) {
+        velY = jumpVelocity;
+        isJumping = true;
+        targetRotation += 180;
+      }
+    })
+
+  const cube = document.getElementById("cube");
+  const upload = document.getElementById("upload");
+
+  // Загрузка изображения при запуске страницы
+  const savedImage = localStorage.getItem("customCube");
+  if (savedImage) {
+    cube.style.backgroundImage = `url(${savedImage})`;
+    cube.style.backgroundSize = "contain";
+    cube.style.backgroundRepeat = "no-repeat";
+    cube.style.backgroundPosition = "center";
+  }
+
+  // Обработка загрузки изображения и сохранение его
+upload.addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const imageData = e.target.result;
+    cube.style.backgroundImage = `url(${imageData})`;
+
+    // Сохраняем изображение в localStorage
+    localStorage.setItem("customCube", imageData);
+  };
+  reader.readAsDataURL(file);
+});
+
+// Загружаем сохранённый куб при входе
+const savedCube = localStorage.getItem("customCube");
+if (savedCube) {
+  cube.style.backgroundImage = `url(${savedCube})`;
+}
+// Сохраняем изображение куба в localStorage при загрузке
+upload.addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const imageData = e.target.result;
+    cube.style.backgroundImage = `url(${imageData})`;
+    localStorage.setItem("customCube", imageData); // сохраняем
+  };
+  reader.readAsDataURL(file);
+});
+
+
+  ;
+
+  gameLoop();
+</script> {
+
+  };
+
+
+    
+
+
+    gameLoop();
+  </script>
+</body>
+</html>
